@@ -1,0 +1,9 @@
+services:
+  _defaults:
+    autowire: true
+    public: true
+
+  Slim\Interfaces\RouteCollectorInterface:
+    class: Slim\Routing\RouteCollector
+    arguments:
+      $cacheFile: '%kernel.cache_dir%/routes.cache.file'

@@ -1,0 +1,22 @@
+services:
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: true
+
+  Symfony\Component\Yaml\Parser:
+    class: Symfony\Component\Yaml\Parser
+
+  Symfony\Component\Yaml\Dumper:
+    class: Symfony\Component\Yaml\Dumper
+
+  App\Ui\Http\Rest\Controller\OpenApiController:
+    class: App\Ui\Http\Rest\Controller\OpenApiController
+    arguments:
+      $openApiFile: '%kernel.resources_dir%/openapi/3.0/openapi.yaml'
+
+  App\Ui\Http\Web\Controller\SwaggerController:
+    class: App\Ui\Http\Web\Controller\SwaggerController
+    arguments:
+      $openApiFile: '%kernel.resources_dir%/openapi/3.0/openapi.yaml'
+      $template: '%kernel.project_dir%/src/Ui/Http/Web/view/swagger/openapi.html'

@@ -1,0 +1,5 @@
+services:
+  Doctrine\DBAL\Connection:
+    factory: [ 'Doctrine\DBAL\DriverManager', 'getConnection' ]
+    arguments:
+      - url: '%env(DATABASE_URL)%'

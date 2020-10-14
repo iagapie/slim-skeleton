@@ -1,0 +1,21 @@
+services:
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+  App\Infrastructure\Cli:
+    class: App\Infrastructure\Cli
+    public: true
+    arguments:
+      $name: '%kernel.name%'
+      $version: '%kernel.version%'
+      $environment: '%kernel.environment%'
+      $commandIds: '%console.command.ids%'
+
+  App\Ui\Cli\HelloCommand:
+    class: App\Ui\Cli\HelloCommand
+    arguments:
+      $name: 'app:hello'
+    tags:
+      - { name: 'console.command', command: 'app:hello' }

@@ -1,0 +1,42 @@
+services:
+  _defaults:
+    autowire: true
+    public: true
+
+  Psr\Http\Message\ResponseFactoryInterface:
+    factory: [ 'Slim\Factory\AppFactory', 'determineResponseFactory' ]
+
+  Slim\Interfaces\CallableResolverInterface:
+    class: Slim\CallableResolver
+
+  Slim\Interfaces\RouteCollectorInterface:
+    class: Slim\Routing\RouteCollector
+
+  Slim\Interfaces\RouteResolverInterface:
+    class: Slim\Routing\RouteResolver
+
+  Slim\Middleware\RoutingMiddleware:
+    class: App\Ui\Http\Middleware\RoutingMiddleware
+
+  App\Ui\Http\Middleware\AddRoutesMiddleware:
+    class: App\Ui\Http\Middleware\AddRoutesMiddleware
+    arguments:
+      $routesPath: '%kernel.config_dir%/routes.php'
+
+  Slim\Middleware\ErrorMiddleware:
+    class: Slim\Middleware\ErrorMiddleware
+    arguments:
+      $displayErrorDetails: '%kernel.debug%'
+      $logErrors: true
+      $logErrorDetails: true
+
+  Slim\Middleware\BodyParsingMiddleware:
+    class: Slim\Middleware\BodyParsingMiddleware
+
+  Slim\App:
+    class: Slim\App
+    calls:
+      - [ add, ['@Slim\Middleware\BodyParsingMiddleware']]
+      - [ add, ['@Slim\Middleware\RoutingMiddleware']]
+      - [ add, ['@App\Ui\Http\Middleware\AddRoutesMiddleware']]
+      - [ add, ['@Slim\Middleware\ErrorMiddleware']]

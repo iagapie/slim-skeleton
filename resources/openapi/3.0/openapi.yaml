@@ -1,0 +1,51 @@
+openapi: "3.0.3"
+info:
+  version: 1.0.0
+  title: App Skeleton
+  license:
+    name: MIT
+servers:
+  - url: http://localhost/api/v1
+paths:
+  /hello:
+    post:
+      summary: Hello api
+      operationId: getHello
+      tags:
+        - hello
+      responses:
+        '200':
+          description: Hello
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hello"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Hello:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

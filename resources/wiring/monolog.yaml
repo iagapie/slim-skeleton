@@ -1,0 +1,21 @@
+services:
+  Monolog\Processor\UidProcessor:
+    class: Monolog\Processor\UidProcessor
+
+  Monolog\Handler\StreamHandler:
+    class: Monolog\Handler\StreamHandler
+    arguments:
+      - '%kernel.logs_dir%/app.log'
+      - '%env(LOGGER_LEVEL)%'
+
+  logger:
+    class: Monolog\Logger
+    public: true
+    arguments: [ '%kernel.name%' ]
+    calls:
+      - [ pushHandler, [ '@Monolog\Handler\StreamHandler' ] ]
+      - [ pushProcessor, [ '@Monolog\Processor\UidProcessor' ] ]
+
+  Psr\Log\LoggerInterface:
+    alias: logger
+    public: true
