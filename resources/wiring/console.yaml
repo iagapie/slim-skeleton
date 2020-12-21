@@ -4,14 +4,14 @@ services:
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
     public: false
 
-  App\Infrastructure\Cli:
-    class: App\Infrastructure\Cli
+  Symfony\Component\Console\Application:
+    class: Symfony\Component\Console\Application
     public: true
     arguments:
       $name: '%kernel.name%'
       $version: '%kernel.version%'
-      $environment: '%kernel.environment%'
-      $commandIds: '%console.command.ids%'
+    calls:
+      - [ setCommandLoader, [ '@console.command_loader' ] ]
 
   App\Ui\Cli\HelloCommand:
     class: App\Ui\Cli\HelloCommand

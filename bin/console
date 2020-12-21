@@ -4,7 +4,6 @@
 declare(strict_types=1);
 
 use App\Infrastructure\Kernel;
-use App\Infrastructure\Cli;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -28,5 +27,4 @@ if ($input->hasParameterOption('--no-debug', true)) {
 (new Dotenv())->bootEnv(\dirname(__DIR__).'/.env');
 
 $kernel = new Kernel($_SERVER['APP_NAME'], $_SERVER['APP_VERSION'], $_SERVER['APP_ENV'], (bool)$_SERVER['APP_DEBUG']);
-$cli = $kernel->getContainer()->get(Cli::class);
-$cli->run($input);
+$kernel->getCli()->run($input);

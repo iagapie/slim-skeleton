@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Infrastructure;
 
+use Exception;
+use LogicException;
 use Psr\Container\ContainerInterface;
+use ReflectionObject;
+use RuntimeException;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -92,10 +98,10 @@ final class Kernel
         foreach (['cache' => $this->getCacheDir(), 'logs' => $this->getLogsDir()] as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                    throw new \RuntimeException(sprintf('Unable to create the "%s" directory (%s).', $name, $dir));
+                    throw new RuntimeException(sprintf('Unable to create the "%s" directory (%s).', $name, $dir));
                 }
             } elseif (!is_writable($dir)) {
-                throw new \RuntimeException(sprintf('Unable to write in the "%s" directory (%s).', $name, $dir));
+                throw new RuntimeException(sprintf('Unable to write in the "%s" directory (%s).', $name, $dir));
             }
         }
     }
@@ -161,10 +167,10 @@ final class Kernel
     public function getProjectDir(): string
     {
         if (false === isset($this->projectDir)) {
-            $r = new \ReflectionObject($this);
+            $r = new ReflectionObject($this);
 
             if (!is_file($dir = $r->getFileName())) {
-                throw new \LogicException(
+                throw new LogicException(
                     sprintf('Cannot auto-detect project dir for kernel of class "%s".', $r->name)
                 );
             }
@@ -223,8 +229,30 @@ final class Kernel
     }
 
     /**
+     * @return Application
+     * @throws Exception
+     */
+    public function getCli(): Application
+    {
+        /** @var Application $cli */
+        $cli = $this->getContainer()->get(Application::class);
+
+        $definition = $cli->getDefinition();
+
+        $definition->addOption(
+            new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $this->getEnvironment())
+        );
+
+        $definition->addOption(
+            new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.')
+        );
+
+        return $cli;
+    }
+
+    /**
      * @return ContainerInterface
-     * @throws \Exception
+     * @throws Exception
      */
     public function getContainer(): ContainerInterface
     {
@@ -264,7 +292,7 @@ final class Kernel
      * Gets a new ContainerBuilder instance used to build the service container.
      *
      * @return ContainerBuilder
-     * @throws \Exception
+     * @throws Exception
      */
     private function getContainerBuilder(): ContainerBuilder
     {
@@ -337,7 +365,7 @@ final class Kernel
     /**
      * @param LoaderInterface $loader
      * @param string $path
-     * @throws \Exception
+     * @throws Exception
      */
     private function loadServices(LoaderInterface $loader, string $path): void
     {
